@@ -25,6 +25,9 @@ public class SpaceComponent implements Runnable {
 		while (running) {
 			screen.render(game);
 			game.tick();
+			try {
+			Thread.sleep(10);
+			} catch(Exception ignore) {}
 		}
 	}
 	

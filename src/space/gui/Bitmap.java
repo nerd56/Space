@@ -45,8 +45,27 @@ public class Bitmap {
 		int w = (int)(Math.abs(width*cos) + Math.abs(height*sin));
 		int h = (int)(Math.abs(height*cos) + Math.abs(width*sin));
 		
-		int centerX = w/2; int centerY = h/2;
-		return this;
+		int[] p = new int[w*h];
+		
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				int xx = x-w/2;
+				int yy = y-h/2;
+				
+				int xr = (int)(xx*cos - yy*sin);
+				int yr = (int)(yy*cos + xx*sin);
+				
+				int ww = width/2 + xr; int hh = height/2+yr;
+				if (ww >= 0 && ww < width & hh >= 0 && hh < height) {
+					int pixel = pixels[ww + hh*width];
+					p[x + y*w] = pixel;
+				} else {
+					p[x + y*w] = IGNORE;
+				}
+			}
+		}
+		
+		return new Bitmap(w, h, p);
 	}
 	
 	public Bitmap getBitmapByScale(double scale) {
@@ -57,8 +76,7 @@ public class Bitmap {
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
 				int pixel = pixels[(int)(x/scale) + (int)(y/scale)*width];
-				if (pixel != IGNORE)
-					p[x + y*w] = pixel; 
+				p[x + y*w] = pixel; 
 			}
 		}
 		return bitmap;

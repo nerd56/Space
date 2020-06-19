@@ -7,6 +7,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Color;
 
 import space.gui.Bitmap;
 import space.gui.Art;
@@ -27,9 +28,13 @@ public class Screen extends JPanel {
 	}
 	
 	public void render(Game game) {
+		flip();
 		bitmap.draw(WIDTH/2,
 					HEIGHT/2,
-					4, Math.PI,Art.rocket);
+					3, -System.currentTimeMillis()%5000/5000.0*Math.PI*2,Art.toxicPlnt);
+		bitmap.draw(WIDTH/2 + (int)(Math.sin(System.currentTimeMillis()%5000/5000.0*Math.PI*2)*WIDTH/3),
+					HEIGHT/2 + (int)(Math.cos(System.currentTimeMillis()%5000/5000.0*Math.PI*2)*WIDTH/3),
+					4, System.currentTimeMillis()%5000/5000.0*Math.PI*2 - Math.PI/2,Art.rocket);
 		repaint();
 	}
 	
@@ -41,8 +46,13 @@ public class Screen extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g = (Graphics2D) g;
-		g.drawImage(img, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
-		g.dispose();
+		Graphics2D g2 = (Graphics2D) g;
+		g2.drawImage(img, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
+		g2.dispose();
+	}
+	
+	private void flip() {
+		for (int i = 0; i < bitmap.width * bitmap.height; i++)
+			bitmap.pixels[i] = 0;
 	}
 }
