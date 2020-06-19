@@ -31,10 +31,18 @@ public class Screen extends JPanel {
 		flip();
 		bitmap.draw(WIDTH/2,
 					HEIGHT/2,
-					3, -System.currentTimeMillis()%5000/5000.0*Math.PI*2,Art.toxicPlnt);
-		bitmap.draw(WIDTH/2 + (int)(Math.sin(System.currentTimeMillis()%5000/5000.0*Math.PI*2)*WIDTH/3),
-					HEIGHT/2 + (int)(Math.cos(System.currentTimeMillis()%5000/5000.0*Math.PI*2)*WIDTH/3),
-					4, System.currentTimeMillis()%5000/5000.0*Math.PI*2 - Math.PI/2,Art.rocket);
+					3, -System.currentTimeMillis()%20000/20000.0*Math.PI*2,Art.toxic);
+					
+		int marsX = WIDTH/2 + (int)(Math.sin(System.currentTimeMillis()%10000/10000.0*Math.PI*2)*WIDTH/3);
+		int marsY = HEIGHT/2 + (int)(Math.cos(System.currentTimeMillis()%10000/10000.0*Math.PI*2)*WIDTH/3);
+		
+		bitmap.draw(marsX,
+					marsY,
+					1, (System.currentTimeMillis()%5000/5000.0*Math.PI*2)*3,Art.mars);
+					
+		bitmap.draw(marsX + (int)(Math.sin(System.currentTimeMillis()%10000/10000.0*Math.PI*4)*50),
+					marsY + (int)(Math.cos(System.currentTimeMillis()%10000/10000.0*Math.PI*4)*50),
+					1, (System.currentTimeMillis()%10000/10000.0*Math.PI*4-Math.PI/2),Art.rocket);
 		repaint();
 	}
 	

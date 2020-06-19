@@ -4,7 +4,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 public class Art {
-	public static final Bitmap toxicPlnt = loadBitmap("/res/ToxicPLNT.png");
+	public static final Bitmap toxic = loadBitmap("/res/ToxicPLNT.png");
+	public static final Bitmap mars = loadBitmap("/res/mars.png");
 	public static final Bitmap rocket = loadBitmap("/res/rocket.png");
 	
 	private static Bitmap loadBitmap(String path) {
