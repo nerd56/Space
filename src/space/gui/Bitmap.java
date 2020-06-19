@@ -42,8 +42,10 @@ public class Bitmap {
 		double cos = Math.cos(angle);
 		double tan = sin/cos;
 		
-		int w = Math.abs(width*cos) + Math.abs(height*sin);
-		int h = Math.abs(height*cos) + Math.abs(width*sin);
+		int w = (int)(Math.abs(width*cos) + Math.abs(height*sin));
+		int h = (int)(Math.abs(height*cos) + Math.abs(width*sin));
+		
+		int centerX = w/2; int centerY = h/2;
 		return this;
 	}
 	
