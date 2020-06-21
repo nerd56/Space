@@ -13,73 +13,37 @@ public class Bitmap {
 		this.pixels = pixels;
 	}
 	
-	public void draw(int xOffset, int yOffset, Bitmap bitmap) {
-		xOffset -= bitmap.width/2;
-		yOffset -= bitmap.height/2;
-		DrawBox db = getDrawBox(xOffset, yOffset, bitmap.width, bitmap.height);
+	public void draw(int xOffset, int yOffset, int newW, int newH, double angle, Bitmap bitmap) {
+		double sin = Math.sin(angle);
+		double cos = Math.cos(angle);
+		double scaleX1 = (double)newW/bitmap.width;
+		double scaleY1 = (double)newH/bitmap.height;
+		int w = (int)(Math.abs(newW*cos) + Math.abs(newH*sin));
+		int h = (int)(Math.abs(newH*cos) + Math.abs(newW*sin));
+		double scaleX = (double)w/bitmap.width;
+		double scaleY = (double)h/bitmap.height;
+		xOffset -= w/2;
+		yOffset -= h/2;
+		DrawBox db = getDrawBox(xOffset, yOffset, w, h);
 		
 		for (int y = 0; y < db.yEnd; y++) {
 			for (int x = 0; x < db.xEnd; x++) {
-				int pixel = bitmap.pixels[x+db.xStart + (db.yStart+y)*bitmap.width];
-				if (pixel != IGNORE)
-					pixels[db.xOffset+x + (db.yOffset+y)*width] = pixel;
-			}
-		}
-	}
-	
-	public void draw(int xOffset, int yOffset, double scale, Bitmap bitmap) {
-		bitmap = bitmap.getBitmapByScale(scale);
-		draw(xOffset, yOffset, bitmap);
-	}
-	
-	public void draw(int xOffset, int yOffset, double scale, double angle, Bitmap bitmap) {
-		bitmap = bitmap.getBitmapByScale(scale).getBitmapByRotate(angle);
-		draw(xOffset, yOffset, bitmap);
-	}
-	
-	public Bitmap getBitmapByRotate(double angle) {
-		double sin = Math.sin(angle);
-		double cos = Math.cos(angle);
-		double tan = sin/cos;
-		
-		int w = (int)(Math.abs(width*cos) + Math.abs(height*sin));
-		int h = (int)(Math.abs(height*cos) + Math.abs(width*sin));
-		
-		int[] p = new int[w*h];
-		
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				int xx = x-w/2;
-				int yy = y-h/2;
+				double xx = x+db.xStart-w/2;
+				double yy = y+db.yStart-h/2;
 				
-				int xr = (int)(xx*cos - yy*sin);
-				int yr = (int)(yy*cos + xx*sin);
+				double xr = (xx*cos - yy*sin);
+				double yr = (yy*cos + xx*sin);
 				
-				int ww = width/2 + xr; int hh = height/2+yr;
-				if (ww >= 0 && ww < width & hh >= 0 && hh < height) {
-					int pixel = pixels[ww + hh*width];
-					p[x + y*w] = pixel;
-				} else {
-					p[x + y*w] = IGNORE;
+				double ww = bitmap.width/2.0 + (xr/scaleX1);
+				double hh = bitmap.height/2.0 + (yr/scaleY1);
+
+				if (ww >= 0 && ww < bitmap.width && hh >= 0 && hh < bitmap.height) {
+					int pixel = bitmap.pixels[(int)ww + (int)hh*bitmap.width];
+					if (pixel != IGNORE)
+						pixels[db.xOffset+x + (db.yOffset+y)*width] = pixel;
 				}
 			}
 		}
-		
-		return new Bitmap(w, h, p);
-	}
-	
-	public Bitmap getBitmapByScale(double scale) {
-		int w = (int)(width*scale);
-		int h = (int)(height*scale);
-		int[] p = new int[w*h];
-		Bitmap bitmap = new Bitmap(w, h, p);
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				int pixel = pixels[(int)(x/scale) + (int)(y/scale)*width];
-				p[x + y*w] = pixel; 
-			}
-		}
-		return bitmap;
 	}
 	
 	private DrawBox getDrawBox(int xOffset, int yOffset, int w, int h) {

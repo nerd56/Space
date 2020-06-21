@@ -1,6 +1,7 @@
 package space;
 
 import javax.swing.JPanel;
+import javax.swing.JComponent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.BufferStrategy;
@@ -9,12 +10,13 @@ import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Color;
 
-import space.gui.Bitmap;
-import space.gui.Art;
+import space.gui.*;
+import space.entity.*;
+import space.geometry.*;
 
 public class Screen extends JPanel {
-	private static final int WIDTH = 640;
-	private static final int HEIGHT = 480;
+	public static final int WIDTH = 640;
+	public static final int HEIGHT = 480;
 	private static final int SCALE = 1;
 	
 	private Bitmap bitmap;
@@ -28,21 +30,20 @@ public class Screen extends JPanel {
 	}
 	
 	public void render(Game game) {
-		flip();
-		bitmap.draw(WIDTH/2,
-					HEIGHT/2,
-					3, -System.currentTimeMillis()%20000/20000.0*Math.PI*2,Art.toxic);
-					
-		int marsX = WIDTH/2 + (int)(Math.sin(System.currentTimeMillis()%10000/10000.0*Math.PI*2)*WIDTH/3);
-		int marsY = HEIGHT/2 + (int)(Math.cos(System.currentTimeMillis()%10000/10000.0*Math.PI*2)*WIDTH/3);
+		int[] pixels = new int[WIDTH*HEIGHT];
+		Bitmap b = new Bitmap(WIDTH, HEIGHT, pixels);
+		Point offset = game.camera.focus;
+		double scale = game.camera.scale;
+		for (Entity e : game.entities) {
+			DrawEntity de = e.drawEntity;
+			Point p = e.hitbox.getCenter().getCopy();
+			p.rotate(offset, game.camera.angle);
+			int x = (int)((p.x - offset.x)*scale)+WIDTH/2;
+			int y = (int)((p.y - offset.y)*scale)+HEIGHT/2;
+			b.draw(x, y, (int)(de.width*scale), (int)(de.height*scale), de.angle-game.camera.angle, de.bitmap);
+		}
 		
-		bitmap.draw(marsX,
-					marsY,
-					1, (System.currentTimeMillis()%5000/5000.0*Math.PI*2)*3,Art.mars);
-					
-		bitmap.draw(marsX + (int)(Math.sin(System.currentTimeMillis()%10000/10000.0*Math.PI*4)*50),
-					marsY + (int)(Math.cos(System.currentTimeMillis()%10000/10000.0*Math.PI*4)*50),
-					1, (System.currentTimeMillis()%10000/10000.0*Math.PI*4-Math.PI/2),Art.rocket);
+		setBitmap(b);
 		repaint();
 	}
 	
@@ -53,14 +54,13 @@ public class Screen extends JPanel {
 	
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawImage(img, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
 		g2.dispose();
 	}
 	
-	private void flip() {
-		for (int i = 0; i < bitmap.width * bitmap.height; i++)
-			bitmap.pixels[i] = 0;
+	private void setBitmap(Bitmap b) {
+		for (int i = 0; i < WIDTH*HEIGHT; i++)
+			bitmap.pixels[i] = b.pixels[i];
 	}
 }
